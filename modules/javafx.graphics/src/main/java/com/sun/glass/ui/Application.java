@@ -82,7 +82,7 @@ public abstract class Application {
     public static class EventHandler {
         private EventHandlerAL quitHandler = EventHandlerAL.emptyHandler;
         private EventHandlerSToB themeChangedHandler = EventHandlerSToB.emptyHandler;
-        private EventHandlerALSa openFilesHandler = null;
+        private EventHandlerALSa openFilesHandler = EventHandlerALSa.emptyHandler;
         
         // quit handler: currently used only on Mac OS X
         public void setQuitHandler(EventHandlerAL handler) {
@@ -91,10 +91,6 @@ public abstract class Application {
 
         public void handleQuitAction(Application app, long time) {
             quitHandler.handle(app, time);
-        }
-
-        public void setOpenFilesHandler(EventHandlerALSa handler) {
-            this.openFilesHandler = openFilesHandler;
         }
 
         // theme changed handler
@@ -108,7 +104,12 @@ public abstract class Application {
 
         // open files - currently used only on Mac OS X
         // the open files which started up the app will arrive before app becomes active
+        public void setOpenFilesHandler(EventHandlerALSa handler) {
+            this.openFilesHandler = handler != null ? handler : EventHandlerALSa.emptyHandler;
+        }
+        
         public void handleOpenFilesAction(Application app, long time, String files[]) {
+            openFilesHandler.handle(app, time, files);
         }
         
         // currently used only on Mac OS X

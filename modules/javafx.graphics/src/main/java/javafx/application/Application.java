@@ -25,8 +25,10 @@
 
 package javafx.application;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.awt.desktop.OpenFilesEvent;
+import java.awt.desktop.OpenFilesHandler;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +39,6 @@ import javafx.stage.Stage;
 import com.sun.javafx.application.LauncherImpl;
 import com.sun.javafx.application.ParametersImpl;
 import com.sun.javafx.application.PlatformImpl;
-import com.sun.javafx.css.StyleManager;
 
 /**
  * Application class from which JavaFX applications extend.
@@ -521,4 +522,19 @@ public abstract class Application {
             PlatformImpl.setPlatformUserAgentStylesheet(url);
         }
     }
+    
+    public void setOpenFilesHandler(OpenFilesHandler handler) {
+        com.sun.glass.ui.Application.EventHandlerALSa h;
+        com.sun.glass.ui.Application.GetApplication().setOpenFilesHandler(
+                (app, time, files) -> {
+                    List<File> files_ = new ArrayList<>(files.length);
+                    for (int i=0; i<files.length; i++) {
+                        files_.add(new File(files[i]));
+                    }
+                    OpenFilesEvent evt = new OpenFilesEvent(files_, null);
+                    handler.openFiles(evt);
+                }
+        );
+    }
+    
 }
