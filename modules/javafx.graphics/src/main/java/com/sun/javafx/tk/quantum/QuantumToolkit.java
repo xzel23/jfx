@@ -349,15 +349,8 @@ public final class QuantumToolkit extends Toolkit {
             };
             pulseTimer = Application.GetApplication().createTimer(timerRunnable);
 
-            Application.GetApplication().setEventHandler(new Application.EventHandler() {
-                @Override public void handleQuitAction(Application app, long time) {
-                    GlassStage.requestClosingAllWindows();
-                }
-
-                @Override public boolean handleThemeChanged(String themeName) {
-                    return PlatformImpl.setAccessibilityTheme(themeName);
-                }
-            });
+            Application.GetApplication().setQuitHandler( (app, time) -> GlassStage.requestClosingAllWindows());
+            Application.GetApplication().setThemeChangedHandler( theme -> PlatformImpl.setAccessibilityTheme(theme));
         }
         // Initialize JavaFX scene graph
         initSceneGraph();

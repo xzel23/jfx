@@ -42,7 +42,75 @@ public abstract class Application {
     private final static String DEFAULT_NAME = "java";
     protected String name = DEFAULT_NAME;
 
+    @FunctionalInterface
+    public interface EventHandlerAL {
+        void handle(Application app, long time);
+        EventHandlerAL emptyHandler = (app,time) -> {};
+    }
+
+    @FunctionalInterface
+    public interface EventHandlerSToB {
+        boolean handle(String s);
+        EventHandlerSToB emptyHandler = s -> false;
+    }
+
+    @FunctionalInterface
+    public interface EventHandlerALSa {
+        void handle(Application app, long time, String files[]);
+        EventHandlerALSa emptyHandler = (app, time, files) -> {};
+    }
+
+    public void setQuitHandler(EventHandlerAL handler) {
+        this.eventHandler.setQuitHandler(handler);
+    }
+
+    public void setThemeChangedHandler(EventHandlerSToB handler) {
+        this.eventHandler.setThemeChangedHandler(handler);
+    }
+
+    public void setOpenFilesHandler(EventHandlerALSa handler) {
+        this.eventHandler.setOpenFilesHandler(handler);
+
+        boolean resendOpenFiles = this.initialOpenedFiles!=null && handler!=null;
+        checkEventThread();
+        if (resendOpenFiles) {
+            // notify the new event handler with initial opened files
+            notifyOpenFiles(this.initialOpenedFiles);
+        }
+    }
+
     public static class EventHandler {
+        private EventHandlerAL quitHandler = EventHandlerAL.emptyHandler;
+        private EventHandlerSToB themeChangedHandler = EventHandlerSToB.emptyHandler;
+        private EventHandlerALSa openFilesHandler = null;
+        
+        // quit handler: currently used only on Mac OS X
+        public void setQuitHandler(EventHandlerAL handler) {
+            this.quitHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+        }
+
+        public void handleQuitAction(Application app, long time) {
+            quitHandler.handle(app, time);
+        }
+
+        public void setOpenFilesHandler(EventHandlerALSa handler) {
+            this.openFilesHandler = openFilesHandler;
+        }
+
+        // theme changed handler
+        public void setThemeChangedHandler(EventHandlerSToB handler) {
+            this.themeChangedHandler = handler != null ? handler : EventHandlerSToB.emptyHandler;
+        }
+
+        public boolean handleThemeChanged(String themeName) {
+            return themeChangedHandler.handle(themeName);
+        }
+
+        // open files - currently used only on Mac OS X
+        // the open files which started up the app will arrive before app becomes active
+        public void handleOpenFilesAction(Application app, long time, String files[]) {
+        }
+        
         // currently used only on Mac OS X
         public void handleWillFinishLaunchingAction(Application app, long time) {
         }
@@ -76,19 +144,9 @@ public abstract class Application {
         // currently used only on Mac OS X
         public void handleDidUnhideAction(Application app, long time) {
         }
-        // currently used only on Mac OS X
-        // the open files which started up the app will arrive before app becomes active
-        public void handleOpenFilesAction(Application app, long time, String files[]) {
-        }
-        // currently used only on Mac OS X
-        public void handleQuitAction(Application app, long time) {
-        }
-        public boolean handleThemeChanged(String themeName) {
-            return false;
-        }
     }
 
-    private EventHandler eventHandler;
+    private EventHandler eventHandler = new EventHandler();
     private boolean initialActiveEventReceived = false;
     private String initialOpenedFiles[] = null;
 
@@ -338,16 +396,6 @@ public abstract class Application {
         // When an app is closing, Mac calls notify- Will/DidHide, Will/DidResignActive
         // on a thread other than the Main thread
         return eventHandler;
-    }
-
-    public void setEventHandler(EventHandler eventHandler) {
-        checkEventThread();
-        boolean resendOpenFiles = ((this.eventHandler != null) && (this.initialOpenedFiles != null));
-        this.eventHandler = eventHandler;
-        if (resendOpenFiles == true) {
-            // notify the new event handler with initial opened files
-            notifyOpenFiles(this.initialOpenedFiles);
-    }
     }
 
     private boolean terminateWhenLastWindowClosed = true;
