@@ -522,9 +522,17 @@ public abstract class Application {
             PlatformImpl.setPlatformUserAgentStylesheet(url);
         }
     }
-    
-    public void setOpenFilesHandler(OpenFilesHandler handler) {
-        com.sun.glass.ui.Application.EventHandlerALSa h;
+
+    /**
+     * Set the open files handler. Events are stored in an internal queue until the handler is set and will be
+     * sent once the handler is set.
+     * 
+     * <p>
+     * NOTE: Setting the open files handler currently only has an effect on macOS.
+     * </p>
+     * @param handler the handler to call when an open files event is received.
+     */
+    public static void setOpenFilesHandler(OpenFilesHandler handler) {
         com.sun.glass.ui.Application.GetApplication().setOpenFilesHandler(
                 (app, time, files) -> {
                     List<File> files_ = new ArrayList<>(files.length);
