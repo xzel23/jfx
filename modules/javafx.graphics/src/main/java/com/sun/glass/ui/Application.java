@@ -33,9 +33,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedList;
+import java.util.*;
 
 public abstract class Application {
 
@@ -60,216 +58,158 @@ public abstract class Application {
         EventHandlerALSa emptyHandler = (app, time, files) -> {};
     }
 
+    private EventHandlerAL willFinishLaunchingHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerAL didFinishLaunchingHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerAL willBecomeActiveHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerAL didBecomeActiveHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerAL willResignActiveHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerAL didResignActiveActionHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerAL didReceiveMemoryWarningHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerAL willHideHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerAL didHideHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerAL willUnhideHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerAL didUnhideHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerAL quitHandler = EventHandlerAL.emptyHandler;
+    private EventHandlerSToB themeChangedHandler = EventHandlerSToB.emptyHandler;
+    private EventHandlerALSa openFilesHandler = EventHandlerALSa.emptyHandler;
+
+    // willFinishLaunching handler: currently used only on Mac OS X
+    public void setWillFinishLaunchingHandler(EventHandlerAL handler) {
+        this.willFinishLaunchingHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+    }
+
+    public void handleWillFinishLaunchingAction(Application app, long time) {
+        willFinishLaunchingHandler.handle(app, time);
+    }
+
+    // didFinishLaunching handler: currently used only on Mac OS X
+    public void setDidFinishLaunchingHandler(EventHandlerAL handler) {
+        this.didFinishLaunchingHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+    }
+
+    public void handleDidFinishLaunchingAction(Application app, long time) {
+        didFinishLaunchingHandler.handle(app, time);
+    }
+
+    // willBecomeActive handler: currently used only on Mac OS X
+    public void setWillBecomeActiveHandler(EventHandlerAL handler) {
+        this.willBecomeActiveHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+    }
+
+    public void handleWillBecomeActiveAction(Application app, long time) {
+        willBecomeActiveHandler.handle(app, time);
+    }
+
+    // didBecomeActive handler: currently used only on Mac OS X
+    public void setDidBecomeActiveHandler(EventHandlerAL handler) {
+        this.didBecomeActiveHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+    }
+
+    public void handleDidBecomeActiveAction(Application app, long time) {
+        didBecomeActiveHandler.handle(app, time);
+    }
+
+    // willResignActive handler: currently used only on Mac OS X
+    public void setWillResignActiveHandler(EventHandlerAL handler) {
+        this.willResignActiveHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+    }
+
+    public void handleWillResignActiveAction(Application app, long time) {
+        willResignActiveHandler.handle(app, time);
+    }
+
+    // didResignActiveAction handler: currently used only on Mac OS X
+    public void setdidResignActiveActionHandler(EventHandlerAL handler) {
+        this.didResignActiveActionHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+    }
+
+    public void handleDidResignActiveAction(Application app, long time) {
+        didResignActiveActionHandler.handle(app, time);
+    }
+
+    // didReceiveMemoryWarning handler: currently used only on Mac OS X
+    public void setDidReceiveMemoryWarningHandler(EventHandlerAL handler) {
+        this.didReceiveMemoryWarningHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+    }
+
+    public void handleDidReceiveMemoryWarning(Application app, long time) {
+        didReceiveMemoryWarningHandler.handle(app, time);
+    }
+
+    // willHide handler: currently used only on Mac OS X
+    public void setWillHideHandler(EventHandlerAL handler) {
+        this.willHideHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+    }
+
+    public void handleWillHideAction(Application app, long time) {
+        willHideHandler.handle(app, time);
+    }
+
+    // didHide handler: currently used only on Mac OS X
+    public void setDidHideHandler(EventHandlerAL handler) {
+        this.didHideHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+    }
+
+    public void handleDidHideAction(Application app, long time) {
+        didHideHandler.handle(app, time);
+    }
+
+    // willUnhide handler: currently used only on Mac OS X
+    public void setWillUnhideHandler(EventHandlerAL handler) {
+        this.willUnhideHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+    }
+
+    public void handleWillUnhideAction(Application app, long time) {
+        willUnhideHandler.handle(app, time);
+    }
+
+    // didUnhide handler: currently used only on Mac OS X
+    public void setDidUnhideHandler(EventHandlerAL handler) {
+        this.didUnhideHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
+    }
+
+    public void handleDidUnhideAction(Application app, long time) {
+        didUnhideHandler.handle(app, time);
+    }
+
+    // quit handler: currently used only on Mac OS X
     public void setQuitHandler(EventHandlerAL handler) {
-        this.eventHandler.setQuitHandler(handler);
+        this.quitHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
     }
 
+    public void handleQuitAction(Application app, long time) {
+        quitHandler.handle(app, time);
+    }
+
+    // theme changed handler
     public void setThemeChangedHandler(EventHandlerSToB handler) {
-        this.eventHandler.setThemeChangedHandler(handler);
+        this.themeChangedHandler = handler != null ? handler : EventHandlerSToB.emptyHandler;
     }
 
-    public void setOpenFilesHandler(EventHandlerALSa handler) {
-        this.eventHandler.setOpenFilesHandler(handler);
+    public boolean handleThemeChanged(String themeName) {
+        return themeChangedHandler.handle(themeName);
+    }
 
-        boolean resendOpenFiles = this.initialOpenedFiles!=null && handler!=null;
+    // open files - currently used only on Mac OS X
+    // the open files which started up the app will arrive before app becomes active
+    public void setOpenFilesHandler(EventHandlerALSa handler) {
+        this.openFilesHandler = handler != null ? handler : EventHandlerALSa.emptyHandler;
+
+        boolean resendOpenFiles = handler!=null && !this.initialOpenedFiles.isEmpty();
         checkEventThread();
         if (resendOpenFiles) {
-            // notify the new event handler with initial opened files
-            notifyOpenFiles(this.initialOpenedFiles);
+            handleOpenFilesAction(this, System.nanoTime(), this.initialOpenedFiles.toArray(String[]::new));
+            // clear initialOpenedFiles after processing
+            this.initialOpenedFiles.clear();
         }
     }
 
-    public void setWillFinishLaunchingHandler(EventHandlerAL handler) {
-        this.eventHandler.setWillFinishLaunchingHandler(handler);
+    public void handleOpenFilesAction(Application app, long time, String files[]) {
+        openFilesHandler.handle(app, time, files);
     }
 
-    public void setDidFinishLaunchingHandler(EventHandlerAL handler) {
-        this.eventHandler.setDidFinishLaunchingHandler(handler);
-    }
-
-    public void setWillBecomeActiveHandler(EventHandlerAL handler) {
-        this.eventHandler.setWillBecomeActiveHandler(handler);
-    }
-
-    public void setDidBecomeActiveHandler(EventHandlerAL handler) {
-        this.eventHandler.setDidBecomeActiveHandler(handler);
-    }
-
-    public void setWillResignActiveHandler(EventHandlerAL handler) {
-        this.eventHandler.setWillResignActiveHandler(handler);
-    }
-
-    public void setDidResignActiveActionHandler(EventHandlerAL handler) {
-        this.eventHandler.setdidResignActiveActionHandler(handler);
-    }
-
-    public void setDidReceiveMemoryWarningHandler(EventHandlerAL handler) {
-        this.eventHandler.setDidReceiveMemoryWarningHandler(handler);
-    }
-
-    public void setWillHideHandler(EventHandlerAL handler) {
-        this.eventHandler.setWillHideHandler(handler);
-    }
-
-    public void setDidHideHandler(EventHandlerAL handler) {
-        this.eventHandler.setDidHideHandler(handler);
-    }
-
-    public void setWillUnhideHandler(EventHandlerAL handler) {
-        this.eventHandler.setWillUnhideHandler(handler);
-    }
-
-    public void setDidUnhideHandler(EventHandlerAL handler) {
-        this.eventHandler.setDidUnhideHandler(handler);
-    }
-    
-    public static class EventHandler {
-        private EventHandlerAL willFinishLaunchingHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerAL didFinishLaunchingHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerAL willBecomeActiveHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerAL didBecomeActiveHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerAL willResignActiveHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerAL didResignActiveActionHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerAL didReceiveMemoryWarningHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerAL willHideHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerAL didHideHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerAL willUnhideHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerAL didUnhideHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerAL quitHandler = EventHandlerAL.emptyHandler;
-        private EventHandlerSToB themeChangedHandler = EventHandlerSToB.emptyHandler;
-        private EventHandlerALSa openFilesHandler = EventHandlerALSa.emptyHandler;
-
-        // willFinishLaunching handler: currently used only on Mac OS X
-        public void setWillFinishLaunchingHandler(EventHandlerAL handler) {
-            this.willFinishLaunchingHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleWillFinishLaunchingAction(Application app, long time) {
-            willFinishLaunchingHandler.handle(app, time);
-        }
-
-        // didFinishLaunching handler: currently used only on Mac OS X
-        public void setDidFinishLaunchingHandler(EventHandlerAL handler) {
-            this.didFinishLaunchingHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleDidFinishLaunchingAction(Application app, long time) {
-            didFinishLaunchingHandler.handle(app, time);
-        }
-
-        // willBecomeActive handler: currently used only on Mac OS X
-        public void setWillBecomeActiveHandler(EventHandlerAL handler) {
-            this.willBecomeActiveHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleWillBecomeActiveAction(Application app, long time) {
-            willBecomeActiveHandler.handle(app, time);
-        }
-
-        // didBecomeActive handler: currently used only on Mac OS X
-        public void setDidBecomeActiveHandler(EventHandlerAL handler) {
-            this.didBecomeActiveHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleDidBecomeActiveAction(Application app, long time) {
-            didBecomeActiveHandler.handle(app, time);
-        }
-
-        // willResignActive handler: currently used only on Mac OS X
-        public void setWillResignActiveHandler(EventHandlerAL handler) {
-            this.willResignActiveHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleWillResignActiveAction(Application app, long time) {
-            willResignActiveHandler.handle(app, time);
-        }
-
-        // didResignActiveAction handler: currently used only on Mac OS X
-        public void setdidResignActiveActionHandler(EventHandlerAL handler) {
-            this.didResignActiveActionHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleDidResignActiveAction(Application app, long time) {
-            didResignActiveActionHandler.handle(app, time);
-        }
-
-        // didReceiveMemoryWarning handler: currently used only on Mac OS X
-        public void setDidReceiveMemoryWarningHandler(EventHandlerAL handler) {
-            this.didReceiveMemoryWarningHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleDidReceiveMemoryWarning(Application app, long time) {
-            didReceiveMemoryWarningHandler.handle(app, time);
-        }
-
-        // willHide handler: currently used only on Mac OS X
-        public void setWillHideHandler(EventHandlerAL handler) {
-            this.willHideHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleWillHideAction(Application app, long time) {
-            willHideHandler.handle(app, time);
-        }
-
-        // didHide handler: currently used only on Mac OS X
-        public void setDidHideHandler(EventHandlerAL handler) {
-            this.didHideHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleDidHideAction(Application app, long time) {
-            didHideHandler.handle(app, time);
-        }
-
-        // willUnhide handler: currently used only on Mac OS X
-        public void setWillUnhideHandler(EventHandlerAL handler) {
-            this.willUnhideHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleWillUnhideAction(Application app, long time) {
-            willUnhideHandler.handle(app, time);
-        }
-
-        // didUnhide handler: currently used only on Mac OS X
-        public void setDidUnhideHandler(EventHandlerAL handler) {
-            this.didUnhideHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleDidUnhideAction(Application app, long time) {
-            didUnhideHandler.handle(app, time);
-        }
-
-        // quit handler: currently used only on Mac OS X
-        public void setQuitHandler(EventHandlerAL handler) {
-            this.quitHandler = handler != null ? handler : EventHandlerAL.emptyHandler;
-        }
-
-        public void handleQuitAction(Application app, long time) {
-            quitHandler.handle(app, time);
-        }
-
-        // theme changed handler
-        public void setThemeChangedHandler(EventHandlerSToB handler) {
-            this.themeChangedHandler = handler != null ? handler : EventHandlerSToB.emptyHandler;
-        }
-
-        public boolean handleThemeChanged(String themeName) {
-            return themeChangedHandler.handle(themeName);
-        }
-
-        // open files - currently used only on Mac OS X
-        // the open files which started up the app will arrive before app becomes active
-        public void setOpenFilesHandler(EventHandlerALSa handler) {
-            this.openFilesHandler = handler != null ? handler : EventHandlerALSa.emptyHandler;
-        }
-        
-        public void handleOpenFilesAction(Application app, long time, String files[]) {
-            openFilesHandler.handle(app, time, files);
-        }
-    }
-
-    private EventHandler eventHandler = new EventHandler();
     private boolean initialActiveEventReceived = false;
-    private String initialOpenedFiles[] = null;
+    private List<String> initialOpenedFiles = new ArrayList<>();
 
     private static boolean loaded = false;
     private static Application application;
@@ -397,108 +337,67 @@ public abstract class Application {
     }
 
     private void notifyWillFinishLaunching() {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleWillFinishLaunchingAction(this, System.nanoTime());
-        }
+        handleWillFinishLaunchingAction(this, System.nanoTime());
     }
 
     private void notifyDidFinishLaunching() {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleDidFinishLaunchingAction(this, System.nanoTime());
-        }
+        handleDidFinishLaunchingAction(this, System.nanoTime());
     }
 
     private void notifyWillBecomeActive() {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleWillBecomeActiveAction(this, System.nanoTime());
-        }
+        handleWillBecomeActiveAction(this, System.nanoTime());
     }
 
     private void notifyDidBecomeActive() {
         this.initialActiveEventReceived = true;
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleDidBecomeActiveAction(this, System.nanoTime());
-        }
+        handleDidBecomeActiveAction(this, System.nanoTime());
     }
 
     private void notifyWillResignActive() {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleWillResignActiveAction(this, System.nanoTime());
-        }
+        handleWillResignActiveAction(this, System.nanoTime());
     }
 
     private boolean notifyThemeChanged(String themeName) {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            return handler.handleThemeChanged(themeName);
-        }
-        return false;
+        return handleThemeChanged(themeName);
     }
 
     private void notifyDidResignActive() {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleDidResignActiveAction(this, System.nanoTime());
-        }
+        handleDidResignActiveAction(this, System.nanoTime());
     }
 
     private void notifyDidReceiveMemoryWarning() {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleDidReceiveMemoryWarning(this, System.nanoTime());
-        }
+        handleDidReceiveMemoryWarning(this, System.nanoTime());
     }
 
     private void notifyWillHide() {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleWillHideAction(this, System.nanoTime());
-        }
+        handleWillHideAction(this, System.nanoTime());
     }
 
     private void notifyDidHide() {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleDidHideAction(this, System.nanoTime());
-        }
+        handleDidHideAction(this, System.nanoTime());
     }
 
     private void notifyWillUnhide() {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleWillUnhideAction(this, System.nanoTime());
-        }
+        handleWillUnhideAction(this, System.nanoTime());
     }
 
     private void notifyDidUnhide() {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleDidUnhideAction(this, System.nanoTime());
-        }
+        handleDidUnhideAction(this, System.nanoTime());
     }
 
     // notificiation when user drag and drops files onto app icon
     private void notifyOpenFiles(String files[]) {
-        if ((this.initialActiveEventReceived == false) && (this.initialOpenedFiles == null)) {
-            // rememeber the initial opened files
-            this.initialOpenedFiles = files;
-        }
-        EventHandler handler = getEventHandler();
-        if ((handler != null) && (files != null)) {
-            handler.handleOpenFilesAction(this, System.nanoTime(), files);
+        if (!this.initialActiveEventReceived) {
+            // remember the initial opened files if application is not yet active
+            this.initialOpenedFiles.addAll(Arrays.asList(files));
+        } else {
+            // otherwise process files directly
+            handleOpenFilesAction(this, System.nanoTime(), files);
         }
     }
 
     private void notifyWillQuit() {
-        EventHandler handler = getEventHandler();
-        if (handler != null) {
-            handler.handleQuitAction(this, System.nanoTime());
-        }
+        handleQuitAction(this, System.nanoTime());
     }
 
     /**
@@ -510,13 +409,6 @@ public abstract class Application {
     public void installDefaultMenus(MenuBar menubar) {
         checkEventThread();
         // To override in subclasses
-    }
-
-    public EventHandler getEventHandler() {
-        //checkEventThread(); // Glass (Mac)
-        // When an app is closing, Mac calls notify- Will/DidHide, Will/DidResignActive
-        // on a thread other than the Main thread
-        return eventHandler;
     }
 
     private boolean terminateWhenLastWindowClosed = true;

@@ -160,10 +160,7 @@ final class MacApplication extends Application implements InvokeLaterDispatcher.
 
         MenuItem quitMenu = createMenuItem("Quit " + getName(), new MenuItem.Callback() {
             @Override public void action() {
-                Application.EventHandler eh = getEventHandler();
-                if (eh != null) {
-                    eh.handleQuitAction(Application.GetApplication(), System.nanoTime());
-                }
+                handleQuitAction(Application.GetApplication(), System.nanoTime());
             }
             @Override public void validate() {
             }
