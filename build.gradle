@@ -545,8 +545,8 @@ defineProperty("BUILD_TIMESTAMP", buildTimestamp)
 def relSuffix = ""
 def relOpt = ""
 if (HUDSON_JOB_NAME == "not_hudson") {
-    relSuffix = "-internal"
-    relOpt = "-${buildTimestamp}"
+    relSuffix = "-dua3"
+    //relOpt = "-${buildTimestamp}"
 } else {
     relSuffix = IS_MILESTONE_FCS ? "" : jfxReleaseSuffix
 }
